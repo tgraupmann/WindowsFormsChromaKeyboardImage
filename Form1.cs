@@ -355,19 +355,19 @@ namespace WindowsFormsChromaKeyboardImage
                 return;
             }
 
+            if (minX == maxX ||
+                minY == maxY)
+            {
+                minX = 0;
+                minY = 0;
+                maxX = bitmap.Width - 1;
+                maxY = bitmap.Height - 1;
+            }
+
             _mMinX = minX;
             _mMinY = minY;
             _mMaxX = maxX;
             _mMaxY = maxY;
-
-            if (minX == maxX ||
-                minY == maxY)
-            {
-                _mMinX = 0;
-                _mMinY = 0;
-                _mMaxX = bitmap.Width - 1;
-                _mMaxY = bitmap.Height - 1;
-            }
 
             // invert outside area
             for (x = 0; x < bitmap.Width; ++x)
@@ -408,20 +408,31 @@ namespace WindowsFormsChromaKeyboardImage
                 return;
             }
 
-            int y = _mMinY;
-            for (int i = 0; i < _sKeys.GetLength(0); ++i, ++y)
+            if (_mMinX == _mMaxX ||
+                _mMinY == _mMaxY)
             {
-                int x = _mMinX;
-                for (int j = 0; j < _sKeys.GetLength(1); ++j, ++x)
+                _mMinX = 0;
+                _mMinY = 0;
+                _mMaxX = bitmap.Width - 1;
+                _mMaxY = bitmap.Height - 1;
+            }
+
+            for (int i = 0; i < _sKeys.GetLength(0); ++i)
+            {
+                float ratioI = i / (float)_sKeys.GetLength(0);
+                int y = _mMinY + (int)(ratioI * (_mMaxY - _mMinY));
+                for (int j = 0; j < _sKeys.GetLength(1); ++j)
                 {
-                    System.Drawing.Color c1 = System.Drawing.Color.Black;
+                    float ratioJ = j / (float)_sKeys.GetLength(1);
+                    int x = _mMinX + (int)(ratioJ * (_mMaxX - _mMinX));
+                    System.Drawing.Color color = System.Drawing.Color.Black;
                     if (x < bitmap.Width &&
                         y < bitmap.Height)
                     {
-                        c1 = bitmap.GetPixel(x, y);
+                        color = bitmap.GetPixel(x, y);
                     }
                     KeyData keyData = _sKeys[i, j];
-                    keyData._mColor = new Color(c1.R, c1.G, c1.B);
+                    keyData._mColor = new Color(color.R, color.G, color.B);
                     SetColor(keyData._mKey, keyData._mColor);
                 }
             }
