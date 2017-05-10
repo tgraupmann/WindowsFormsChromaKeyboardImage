@@ -33,6 +33,57 @@ namespace WindowsFormsChromaKeyboardImage
         private static KeyData[,] _sKeys =
         {
             {
+                Key.Invalid,
+                Key.Escape,
+                Key.Invalid,
+                Key.Invalid,
+                Key.F1,
+                Key.F2,
+                Key.F3,
+                Key.F4,
+                Key.F5,
+                Key.F6,
+                Key.F7,
+                Key.F8,
+                Key.F9,
+                Key.F10,
+                Key.F11,
+                Key.F12,
+                Key.PrintScreen,
+                Key.Scroll,
+                Key.Pause,
+                Key.Invalid,
+                Key.Invalid,
+                Key.Invalid,
+            },
+
+            {
+                Key.Macro1,
+                Key.Oem1, //~
+                Key.One,
+                Key.Two,
+                Key.Three,
+                Key.Four,
+                Key.Five,
+                Key.Six,
+                Key.Seven,
+                Key.Eight,
+                Key.Nine,
+                Key.Zero,
+                Key.Oem2, //-
+                Key.Oem3, //+
+                Key.Backspace,
+                Key.Insert,
+                Key.Home,
+                Key.PageUp,
+                Key.NumLock,
+                Key.NumDivide,
+                Key.NumMultiply,
+                Key.NumSubtract,
+            },
+
+            {
+                Key.Macro2,
                 Key.Tab,
                 Key.Q,
                 Key.W,
@@ -53,8 +104,10 @@ namespace WindowsFormsChromaKeyboardImage
                 Key.Num7,
                 Key.Num8,
                 Key.Num9,
+                Key.NumAdd,
             },
             {
+                Key.Macro3,
                 Key.CapsLock,
                 Key.A,
                 Key.S,
@@ -75,8 +128,10 @@ namespace WindowsFormsChromaKeyboardImage
                 Key.Num4,
                 Key.Num5,
                 Key.Num6,
+                Key.NumAdd,
             },
             {
+                Key.Macro4,
                 Key.LeftShift,
                 Key.Z,
                 Key.X,
@@ -97,6 +152,32 @@ namespace WindowsFormsChromaKeyboardImage
                 Key.Num1,
                 Key.Num2,
                 Key.Num3,
+                Key.NumEnter,
+            },
+
+            {
+                Key.Macro5,
+                Key.LeftControl,
+                Key.LeftWindows,
+                Key.LeftAlt,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.RightAlt,
+                Key.Function,
+                Key.RightMenu,
+                Key.RightControl,
+                Key.Left,
+                Key.Down,
+                Key.Right,
+                Key.Num0,
+                Key.Num0,
+                Key.NumDecimal,
+                Key.NumEnter,
+                Key.Invalid,
             },
         };
 
@@ -114,13 +195,22 @@ namespace WindowsFormsChromaKeyboardImage
 
         private void _mButtonLoadImage_Click(object sender, EventArgs e)
         {
+            if (null != _mPicture.Image)
+            {
+                _mPicture.Image.Dispose();
+            }
+
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
             openFileDialog1.InitialDirectory = "c:\\";
             openFileDialog1.Filter = "image files (*.jpg)|*.jpg";
             openFileDialog1.FilterIndex = 2;
             openFileDialog1.RestoreDirectory = true;
-            if (!string.IsNullOrEmpty(_mFileName))
+            if (string.IsNullOrEmpty(_mFileName))
+            {
+                openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
+            }
+            else
             {
                 openFileDialog1.FileName = _mFileName;
                 openFileDialog1.InitialDirectory = Path.GetDirectoryName(_mFileName);
@@ -135,6 +225,8 @@ namespace WindowsFormsChromaKeyboardImage
                 key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(KEY_CHROMA_IMAGE);
                 key.SetValue(KEY_IMAGE, _mFileName);
                 key.Close();
+
+                _mPicture_Click(null, new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
             }
         }
 
@@ -158,6 +250,8 @@ namespace WindowsFormsChromaKeyboardImage
                     }
                 }
             }
+
+            _mPicture_Click(null, new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
         }
 
         private static void SetColor(Key key, Color color)
@@ -196,11 +290,11 @@ namespace WindowsFormsChromaKeyboardImage
             }
             */
 
-            int x = minX;
-            for (int i = 0; i < _sKeys.GetLength(0); ++i, ++x)
+            int y = minY;
+            for (int i = 0; i < _sKeys.GetLength(0); ++i, ++y)
             {
-                int y = minY;
-                for (int j = 0; j < _sKeys.GetLength(1); ++j, ++y)
+                int x = minX;
+                for (int j = 0; j < _sKeys.GetLength(1); ++j, ++x)
                 {
                     System.Drawing.Color c1 = System.Drawing.Color.Black;
                     if (x < bitmap.Width &&
@@ -212,7 +306,6 @@ namespace WindowsFormsChromaKeyboardImage
                     keyData._mColor = new Color(c1.R, c1.G, c1.B);
                     SetColor(keyData._mKey, keyData._mColor);
                 }
-                ++minX;
             }
         }
     }
