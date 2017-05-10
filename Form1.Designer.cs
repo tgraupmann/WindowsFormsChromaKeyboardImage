@@ -65,7 +65,8 @@
             this._mPicture.Size = new System.Drawing.Size(649, 412);
             this._mPicture.TabIndex = 2;
             this._mPicture.TabStop = false;
-            this._mPicture.Click += new System.EventHandler(this._mPicture_Click);
+            this._mPicture.MouseDown += _mPicture_MouseDown;
+            this._mPicture.MouseUp += _mPicture_MouseUp;
             // 
             // Form1
             // 

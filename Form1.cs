@@ -15,6 +15,11 @@ namespace WindowsFormsChromaKeyboardImage
 
         private string _mFileName = string.Empty;
 
+        private int _mMinX = 0;
+        private int _mMinY = 0;
+        private int _mMaxX = 0;
+        private int _mMaxY = 0;
+
         private class KeyData
         {
             public Key _mKey;
@@ -193,6 +198,21 @@ namespace WindowsFormsChromaKeyboardImage
             Application.Exit();
         }
 
+        private void LoadImage()
+        {
+            if (null != _mPicture.Image)
+            {
+                _mPicture.Image.Dispose();
+            }
+
+            _mPicture.Image = Image.FromFile(_mFileName);
+
+            Microsoft.Win32.RegistryKey key;
+            key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(KEY_CHROMA_IMAGE);
+            key.SetValue(KEY_IMAGE, _mFileName);
+            key.Close();
+        }
+
         private void _mButtonLoadImage_Click(object sender, EventArgs e)
         {
             if (null != _mPicture.Image)
@@ -219,14 +239,8 @@ namespace WindowsFormsChromaKeyboardImage
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 _mFileName = openFileDialog1.FileName;
-                _mPicture.Image = Image.FromFile(_mFileName);
-
-                Microsoft.Win32.RegistryKey key;
-                key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(KEY_CHROMA_IMAGE);
-                key.SetValue(KEY_IMAGE, _mFileName);
-                key.Close();
-
-                _mPicture_Click(null, new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
+                LoadImage();
+                DisplayImageOnKeyboard();
             }
         }
 
@@ -251,7 +265,7 @@ namespace WindowsFormsChromaKeyboardImage
                 }
             }
 
-            _mPicture_Click(null, new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
+            DisplayImageOnKeyboard();
         }
 
         private static void SetColor(Key key, Color color)
@@ -262,7 +276,7 @@ namespace WindowsFormsChromaKeyboardImage
             }
         }
 
-        private void _mPicture_Click(object sender, EventArgs e)
+        private void _mPicture_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             Image image = _mPicture.Image;
             if (null == image)
@@ -276,24 +290,128 @@ namespace WindowsFormsChromaKeyboardImage
                 return;
             }
 
-            MouseEventArgs evt = e as MouseEventArgs;
-            int minX = (int)(evt.X / (float)_mPicture.Width * bitmap.Width);
-            int minY = (int)(evt.Y / (float)_mPicture.Height * bitmap.Height);
-
-
-            /*
+            int minX = (int)(e.X / (float)_mPicture.Width * bitmap.Width);
+            int minY = (int)(e.Y / (float)_mPicture.Height * bitmap.Height);
             if (minX < bitmap.Width &&
                 minY < bitmap.Height)
             {
-                bitmap.SetPixel(minX, minY, System.Drawing.Color.Red);
-                _mPicture.Image = bitmap;
+                _mMinX = minX;
+                _mMinY = minY;
             }
+            else
+            {
+                return;
+            }
+
+            /*
+            bitmap.SetPixel(_mMinX, _mMinY, System.Drawing.Color.Green);
+            _mPicture.Image = bitmap;
             */
 
-            int y = minY;
+            return;
+        }
+
+        private void _mPicture_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            LoadImage();
+
+            Image image = _mPicture.Image;
+            if (null == image)
+            {
+                return;
+            }
+
+            Bitmap bitmap = image as Bitmap;
+            if (null == bitmap)
+            {
+                return;
+            }
+
+            MouseEventArgs evt = e as MouseEventArgs;
+            int x = (int)(evt.X / (float)_mPicture.Width * bitmap.Width);
+            int y = (int)(evt.Y / (float)_mPicture.Height * bitmap.Height);
+
+            int minX = Math.Min(_mMinX, x);
+            if (minX < 0 || minX >= bitmap.Width)
+            {
+                return;
+            }
+
+            int minY = Math.Min(_mMinY, y);
+            if (minY < 0 || minY >= bitmap.Height)
+            {
+                return;
+            }
+
+            int maxX = Math.Max(_mMinX, x);
+            if (maxX < 0 || maxX >= bitmap.Width)
+            {
+                return;
+            }
+
+            int maxY = Math.Max(_mMinY, y);
+            if (maxY < 0 || maxY >= bitmap.Height)
+            {
+                return;
+            }
+
+            _mMinX = minX;
+            _mMinY = minY;
+            _mMaxX = maxX;
+            _mMaxY = maxY;
+
+            if (minX == maxX ||
+                minY == maxY)
+            {
+                _mMinX = 0;
+                _mMinY = 0;
+                _mMaxX = bitmap.Width - 1;
+                _mMaxY = bitmap.Height - 1;
+            }
+
+            // invert outside area
+            for (x = 0; x < bitmap.Width; ++x)
+            {
+                for (y = 0; y < bitmap.Height; ++y)
+                {
+                    if (x < minX || x > maxX ||
+                        y < minY || y > maxY)
+                    {
+                        System.Drawing.Color c = bitmap.GetPixel(x, y);
+                        c = System.Drawing.Color.FromArgb(c.A, 255 - c.R, 255 - c.G, 255 - c.B);
+                        bitmap.SetPixel(x, y, c);
+                    }
+                }
+            }
+
+            _mPicture.Image = bitmap;
+
+            /*
+            bitmap.SetPixel(x, y, System.Drawing.Color.Red);
+            _mPicture.Image = bitmap;
+            */
+
+            DisplayImageOnKeyboard();
+        }
+
+        private void DisplayImageOnKeyboard()
+        {
+            Image image = _mPicture.Image;
+            if (null == image)
+            {
+                return;
+            }
+
+            Bitmap bitmap = image as Bitmap;
+            if (null == bitmap)
+            {
+                return;
+            }
+
+            int y = _mMinY;
             for (int i = 0; i < _sKeys.GetLength(0); ++i, ++y)
             {
-                int x = minX;
+                int x = _mMinX;
                 for (int j = 0; j < _sKeys.GetLength(1); ++j, ++x)
                 {
                     System.Drawing.Color c1 = System.Drawing.Color.Black;
