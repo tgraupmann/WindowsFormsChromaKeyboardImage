@@ -28,10 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this._mButtonQuit = new System.Windows.Forms.Button();
             this._mButtonLoadImage = new System.Windows.Forms.Button();
             this._mPicture = new System.Windows.Forms.PictureBox();
             this._mComboBoxLayout = new System.Windows.Forms.ComboBox();
+            this._mTimerAnimation = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this._mPicture)).BeginInit();
             this.SuspendLayout();
             // 
@@ -76,6 +78,11 @@
             this._mComboBoxLayout.TabIndex = 3;
             this._mComboBoxLayout.SelectedIndexChanged += new System.EventHandler(this._mComboBoxLayout_SelectedIndexChanged);
             // 
+            // _mTimerAnimation
+            // 
+            this._mTimerAnimation.Interval = 1000;
+            this._mTimerAnimation.Tick += new System.EventHandler(this._mTimerAnimation_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -99,6 +106,7 @@
         private System.Windows.Forms.Button _mButtonLoadImage;
         private System.Windows.Forms.PictureBox _mPicture;
         private System.Windows.Forms.ComboBox _mComboBoxLayout;
+        private System.Windows.Forms.Timer _mTimerAnimation;
     }
 }
 

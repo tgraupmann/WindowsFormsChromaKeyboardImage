@@ -15,6 +15,7 @@ namespace WindowsFormsChromaKeyboardImage
         private const string ITEM_BLACK_WIDOW = "Razer BlackWidow Chroma";
         private const string ITEM_BLADE = "Blade Chroma";
 
+        private bool _mLoadingTexture = false;
         private string _mFileName = string.Empty;
 
         private int _mMinX = 0;
@@ -336,6 +337,11 @@ namespace WindowsFormsChromaKeyboardImage
                 _mPicture.Image.Dispose();
             }
 
+            if (!File.Exists(_mFileName))
+            {
+                return;
+            }
+
             _mPicture.Image = Image.FromFile(_mFileName);
 
             Microsoft.Win32.RegistryKey key;
@@ -346,20 +352,22 @@ namespace WindowsFormsChromaKeyboardImage
 
         private void _mButtonLoadImage_Click(object sender, EventArgs e)
         {
+            _mLoadingTexture = true;
+
             if (null != _mPicture.Image)
             {
                 _mPicture.Image.Dispose();
+                _mPicture.Image = null;
             }
 
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
             openFileDialog1.InitialDirectory = "c:\\";
-            openFileDialog1.Filter = "image files (*.jpg)|*.jpg";
-            openFileDialog1.FilterIndex = 2;
-            openFileDialog1.RestoreDirectory = true;
+            openFileDialog1.Filter = "image files (*.jpg;*.gif)|*.jpg;*.gif";
             if (string.IsNullOrEmpty(_mFileName))
             {
                 openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
+                openFileDialog1.FileName = string.Empty;
             }
             else
             {
@@ -367,12 +375,22 @@ namespace WindowsFormsChromaKeyboardImage
                 openFileDialog1.InitialDirectory = Path.GetDirectoryName(_mFileName);
             }
 
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            try
             {
-                _mFileName = openFileDialog1.FileName;
-                LoadImage();
-                DisplayImageOnKeyboard();
+                _mFileName = null;
+                if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    _mFileName = openFileDialog1.FileName;
+                    LoadImage();
+                    DisplayImageOnKeyboard();
+                }
             }
+            catch (ArgumentException)
+            {
+                _mFileName = null;
+            }
+
+            _mLoadingTexture = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -393,10 +411,7 @@ namespace WindowsFormsChromaKeyboardImage
                     if (null != key)
                     {
                         _mFileName = (string)key.GetValue(KEY_IMAGE);
-                        if (!string.IsNullOrEmpty(_mFileName))
-                        {
-                            _mPicture.Image = Image.FromFile(_mFileName);
-                        }
+                        LoadImage();
                     }
                 }
             }
@@ -405,6 +420,8 @@ namespace WindowsFormsChromaKeyboardImage
 
             _mPicture.MouseDown += _mPicture_MouseDown;
             _mPicture.MouseUp += _mPicture_MouseUp;
+
+            _mTimerAnimation.Start();
         }
 
         private static void SetColor(Key key, Color color)
@@ -547,6 +564,11 @@ namespace WindowsFormsChromaKeyboardImage
                 return;
             }
 
+            if (string.IsNullOrEmpty(_mFileName))
+            {
+                return;
+            }
+
             if (_mMinX == _mMaxX ||
                 _mMinY == _mMaxY)
             {
@@ -596,6 +618,15 @@ namespace WindowsFormsChromaKeyboardImage
                     return;
             }
 
+            DisplayImageOnKeyboard();
+        }
+
+        private void _mTimerAnimation_Tick(object sender, EventArgs e)
+        {
+            if (_mLoadingTexture)
+            {
+                return;
+            }
             DisplayImageOnKeyboard();
         }
     }
