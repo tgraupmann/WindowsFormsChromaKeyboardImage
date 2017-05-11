@@ -80,7 +80,6 @@
             // 
             // _mTimerAnimation
             // 
-            this._mTimerAnimation.Interval = 1000;
             this._mTimerAnimation.Tick += new System.EventHandler(this._mTimerAnimation_Tick);
             // 
             // Form1
