@@ -31,6 +31,7 @@
             this._mButtonQuit = new System.Windows.Forms.Button();
             this._mButtonLoadImage = new System.Windows.Forms.Button();
             this._mPicture = new System.Windows.Forms.PictureBox();
+            this._mComboBoxLayout = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this._mPicture)).BeginInit();
             this.SuspendLayout();
             // 
@@ -65,14 +66,22 @@
             this._mPicture.Size = new System.Drawing.Size(649, 412);
             this._mPicture.TabIndex = 2;
             this._mPicture.TabStop = false;
-            this._mPicture.MouseDown += _mPicture_MouseDown;
-            this._mPicture.MouseUp += _mPicture_MouseUp;
+            // 
+            // _mComboBoxLayout
+            // 
+            this._mComboBoxLayout.FormattingEnabled = true;
+            this._mComboBoxLayout.Location = new System.Drawing.Point(434, 14);
+            this._mComboBoxLayout.Name = "_mComboBoxLayout";
+            this._mComboBoxLayout.Size = new System.Drawing.Size(227, 21);
+            this._mComboBoxLayout.TabIndex = 3;
+            this._mComboBoxLayout.SelectedIndexChanged += new System.EventHandler(this._mComboBoxLayout_SelectedIndexChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(673, 494);
+            this.Controls.Add(this._mComboBoxLayout);
             this.Controls.Add(this._mPicture);
             this.Controls.Add(this._mButtonLoadImage);
             this.Controls.Add(this._mButtonQuit);
@@ -89,6 +98,7 @@
         private System.Windows.Forms.Button _mButtonQuit;
         private System.Windows.Forms.Button _mButtonLoadImage;
         private System.Windows.Forms.PictureBox _mPicture;
+        private System.Windows.Forms.ComboBox _mComboBoxLayout;
     }
 }
 

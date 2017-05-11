@@ -10,8 +10,10 @@ namespace WindowsFormsChromaKeyboardImage
 {
     public partial class Form1 : Form
     {
-        const string KEY_CHROMA_IMAGE = "CHROMA_IMAGE";
-        const string KEY_IMAGE = "IMAGE";
+        private const string KEY_CHROMA_IMAGE = "CHROMA_IMAGE";
+        private const string KEY_IMAGE = "IMAGE";
+        private const string ITEM_BLACK_WIDOW = "Razer BlackWidow Chroma";
+        private const string ITEM_BLADE = "Blade Chroma";
 
         private string _mFileName = string.Empty;
 
@@ -35,7 +37,9 @@ namespace WindowsFormsChromaKeyboardImage
 
         #region Key layout
 
-        private static KeyData[,] _sKeys =
+        private static KeyData[,] _sKeys = null;
+
+        private static readonly KeyData[,] KEYS_BLACK_WINDOW =
         {
             {
                 Key.Invalid,
@@ -186,6 +190,133 @@ namespace WindowsFormsChromaKeyboardImage
             },
         };
 
+        private static readonly KeyData[,] KEYS_BLADE =
+        {
+            {
+                Key.Escape,
+                Key.Invalid,
+                Key.Invalid,
+                Key.F1,
+                Key.F2,
+                Key.F3,
+                Key.F4,
+                Key.F5,
+                Key.F6,
+                Key.F7,
+                Key.F8,
+                Key.F9,
+                Key.F10,
+                Key.F11,
+                Key.F12,
+                Key.PrintScreen,
+                Key.Scroll,
+                Key.Pause,
+            },
+
+            {
+                Key.Oem1, //~
+                Key.One,
+                Key.Two,
+                Key.Three,
+                Key.Four,
+                Key.Five,
+                Key.Six,
+                Key.Seven,
+                Key.Eight,
+                Key.Nine,
+                Key.Zero,
+                Key.Oem2, //-
+                Key.Oem3, //+
+                Key.Backspace,
+                Key.Insert,
+                Key.Home,
+                Key.PageUp,
+                Key.Invalid,
+            },
+
+            {
+                Key.Tab,
+                Key.Q,
+                Key.W,
+                Key.E,
+                Key.R,
+                Key.T,
+                Key.Y,
+                Key.U,
+                Key.I,
+                Key.O,
+                Key.P,
+                Key.Oem4, //[
+                Key.Oem5, //]
+                Key.Oem6, //\
+                Key.Delete,
+                Key.End,
+                Key.PageDown,
+                Key.Invalid,
+            },
+            {
+                Key.CapsLock,
+                Key.A,
+                Key.S,
+                Key.D,
+                Key.F,
+                Key.G,
+                Key.H,
+                Key.J,
+                Key.K,
+                Key.L,
+                Key.Oem7, //;
+                Key.Oem8, //'
+                Key.Enter,
+                Key.Invalid,
+                Key.Invalid,
+                Key.Invalid,
+                Key.Invalid,
+                Key.Invalid,
+            },
+            {
+                Key.LeftShift,
+                Key.Z,
+                Key.X,
+                Key.C,
+                Key.V,
+                Key.B,
+                Key.N,
+                Key.M,
+                Key.Oem9, //,
+                Key.Oem10, //.
+                Key.Oem11, //?
+                Key.RightShift,
+                Key.Invalid,
+                Key.Invalid,
+                Key.Invalid,
+                Key.Up,
+                Key.Invalid,
+                Key.Invalid,
+            },
+
+            {
+                Key.LeftControl,
+                Key.LeftWindows,
+                Key.LeftAlt,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.Space,
+                Key.RightAlt,
+                Key.Function,
+                Key.RightMenu,
+                Key.RightControl,
+                Key.Left,
+                Key.Down,
+                Key.Right,
+                Key.Invalid,
+                Key.Invalid,
+            },
+        };
+
         #endregion
 
         public Form1()
@@ -246,6 +377,11 @@ namespace WindowsFormsChromaKeyboardImage
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            _mComboBoxLayout.Items.Clear();
+            _mComboBoxLayout.Items.Add("Razer BlackWidow Chroma");
+            _mComboBoxLayout.Items.Add("Blade Chroma");
+            _mComboBoxLayout.SelectedIndex = 0;
+
             _mPicture.SizeMode = PictureBoxSizeMode.StretchImage;
 
             Microsoft.Win32.RegistryKey key;
@@ -266,6 +402,9 @@ namespace WindowsFormsChromaKeyboardImage
             }
 
             DisplayImageOnKeyboard();
+
+            _mPicture.MouseDown += _mPicture_MouseDown;
+            _mPicture.MouseUp += _mPicture_MouseUp;
         }
 
         private static void SetColor(Key key, Color color)
@@ -436,6 +575,28 @@ namespace WindowsFormsChromaKeyboardImage
                     SetColor(keyData._mKey, keyData._mColor);
                 }
             }
+        }
+
+        private void _mComboBoxLayout_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_mComboBoxLayout.SelectedIndex < 0)
+            {
+                return;
+            }
+            string item = (string)_mComboBoxLayout.Items[_mComboBoxLayout.SelectedIndex];
+            switch (item)
+            {
+                case ITEM_BLACK_WIDOW:
+                    _sKeys = KEYS_BLACK_WINDOW;
+                    break;
+                case ITEM_BLADE:
+                    _sKeys = KEYS_BLADE;
+                    break;
+                default:
+                    return;
+            }
+
+            DisplayImageOnKeyboard();
         }
     }
 }
