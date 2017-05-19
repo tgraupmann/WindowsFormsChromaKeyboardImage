@@ -396,8 +396,8 @@ namespace WindowsFormsChromaKeyboardImage
         private void Form1_Load(object sender, EventArgs e)
         {
             _mComboBoxLayout.Items.Clear();
-            _mComboBoxLayout.Items.Add("Razer BlackWidow Chroma");
-            _mComboBoxLayout.Items.Add("Blade Chroma");
+            _mComboBoxLayout.Items.Add(ITEM_BLACK_WIDOW);
+            _mComboBoxLayout.Items.Add(ITEM_BLADE);
             _mComboBoxLayout.SelectedIndex = 0;
 
             _mPicture.SizeMode = PictureBoxSizeMode.StretchImage;
